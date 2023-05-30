@@ -9,6 +9,7 @@
 #include "Direct2DHelloWorld.h"
 
 
+
 //
 // Provides the entry point to the application.
 //
@@ -98,7 +99,10 @@ HRESULT DemoApp::Initialize()
         // Because the CreateWindow function takes its size in pixels, we
         // obtain the system DPI and use it to scale the window size.
         FLOAT dpiX, dpiY;
-        m_pD2DFactory->GetDesktopDpi(&dpiX, &dpiY);
+//        m_pD2DFactory->GetDesktopDpi(&dpiX, &dpiY);
+
+        dpiX = (FLOAT)GetDpiForWindow(GetDesktopWindow());
+        dpiY = dpiX;
 
         m_hwnd = CreateWindow(
             L"D2DDemoApp",
