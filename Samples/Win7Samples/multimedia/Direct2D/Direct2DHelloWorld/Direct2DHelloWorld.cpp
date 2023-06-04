@@ -20,8 +20,7 @@ int WINAPI WinMain(
     int /*nCmdShow*/
     )
 {
-    // Ignore the return value because we want to run the program even in the
-    // unlikely event that HeapSetInformation fails.
+    // HeapSetInformation이 실패하는 드문 경우에도 프로그램을 실행하기를 원하므로 반환 값을 무시합니다.
     HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
 
     if (SUCCEEDED(CoInitialize(NULL)))
@@ -55,7 +54,7 @@ DemoApp::DemoApp() :
 }
 
 //
-// Release resources.
+// 리소스를 해제합니다.
 //
 DemoApp::~DemoApp()
 {
@@ -68,15 +67,13 @@ DemoApp::~DemoApp()
 }
 
 //
-// Creates the application window and initializes
-// device-independent resources.
+// 응용 프로그램 창을 만들고 장치 독립적인 리소스를 초기화합니다.
 //
 HRESULT DemoApp::Initialize()
 {
     HRESULT hr;
 
-    // Initialize device-indpendent resources, such
-    // as the Direct2D factory.
+    // Direct2D 팩터리와 같은 장치 독립적 리소스를 초기화합니다.
     hr = CreateDeviceIndependentResources();
     if (SUCCEEDED(hr))
     {
@@ -94,10 +91,11 @@ HRESULT DemoApp::Initialize()
 
         RegisterClassEx(&wcex);
 
-        // Create the application window.
-        //
-        // Because the CreateWindow function takes its size in pixels, we
-        // obtain the system DPI and use it to scale the window size.
+/*
+    응용 프로그램 창을 만듭니다.
+    CreateWindow 함수는 크기를 픽셀 단위로 사용하기 때문에
+    시스템 DPI를 가져와 창 크기를 조정하는 데 사용합니다.
+*/
         FLOAT dpiX, dpiY;
 //        m_pD2DFactory->GetDesktopDpi(&dpiX, &dpiY);
 
@@ -130,13 +128,12 @@ HRESULT DemoApp::Initialize()
 }
 
 
-//
-// Create resources which are not bound
-// to any device. Their lifetime effectively extends for the
-// duration of the app. These resources include the Direct2D and
-// DirectWrite factories,  and a DirectWrite Text Format object
-// (used for identifying particular font characteristics).
-//
+/*
+    장치에 바인딩되지 않은 리소스를 만듭니다.
+    수명은 앱이 지속되는 동안 효과적으로 연장됩니다.
+    이러한 리소스에는 Direct2D 및 DirectWrite 팩터리와
+    DirectWrite 텍스트 형식 개체(특정 글꼴 특성을 식별하는 데 사용됨)가 포함됩니다.
+*/
 HRESULT DemoApp::CreateDeviceIndependentResources()
 {
     static const WCHAR msc_fontName[] = L"Verdana";
@@ -144,12 +141,12 @@ HRESULT DemoApp::CreateDeviceIndependentResources()
     HRESULT hr;
     ID2D1GeometrySink *pSink = NULL;
 
-    // Create a Direct2D factory.
+    // Direct2D 팩터리를 만듭니다.
     hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
 
     if (SUCCEEDED(hr))
     {
-        // Create a DirectWrite factory.
+        // DirectWrite 팩터리를 만듭니다.
         hr = DWriteCreateFactory(
             DWRITE_FACTORY_TYPE_SHARED,
             __uuidof(m_pDWriteFactory),
@@ -158,7 +155,7 @@ HRESULT DemoApp::CreateDeviceIndependentResources()
     }
     if (SUCCEEDED(hr))
     {
-        // Create a DirectWrite text format object.
+        // DirectWrite 텍스트 형식 개체를 만듭니다.
         hr = m_pDWriteFactory->CreateTextFormat(
             msc_fontName,
             NULL,
@@ -172,7 +169,7 @@ HRESULT DemoApp::CreateDeviceIndependentResources()
     }
     if (SUCCEEDED(hr))
     {
-        // Center the text horizontally and vertically.
+        // 텍스트를 수평 및 수직으로 중앙에 맞춥니다.
         m_pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 
         m_pTextFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
@@ -184,12 +181,11 @@ HRESULT DemoApp::CreateDeviceIndependentResources()
     return hr;
 }
 
-//
-//  This method creates resources which are bound to a particular
-//  Direct3D device. It's all centralized here, in case the resources
-//  need to be recreated in case of Direct3D device loss (eg. display
-//  change, remoting, removal of video card, etc).
-//
+/*
+    이 메서드는 특정 Direct3D 장치에 바인딩된 리소스를 만듭니다.
+    Direct3D 장치가 손실된 경우(예: 디스플레이 변경, 원격, 비디오 카드 제거 등)
+    리소스를 다시 생성해야 하는 경우를 대비하여 모두 여기에 중앙 집중화되어 있습니다.
+*/
 HRESULT DemoApp::CreateDeviceResources()
 {
     HRESULT hr = S_OK;
@@ -227,8 +223,7 @@ HRESULT DemoApp::CreateDeviceResources()
 
 
 //
-//  Discard device-specific resources which need to be recreated
-//  when a Direct3D device is lost
+//  Direct3D 장치가 손실된 경우 재생성해야 하는 장치별 리소스 폐기
 //
 void DemoApp::DiscardDeviceResources()
 {
@@ -251,17 +246,14 @@ void DemoApp::RunMessageLoop()
 }
 
 
-//
-//  Called whenever the application needs to display the client
-//  window. This method writes "Hello, World"
-//
-//  Note that this function will not render anything if the window
-//  is occluded (e.g. when the screen is locked).
-//  Also, this function will automatically discard device-specific
-//  resources if the Direct3D device disappears during function
-//  invocation, and will recreate the resources the next time it's
-//  invoked.
-//
+/*
+애플리케이션이 클라이언트 창을 표시해야 할 때마다 호출됩니다.
+이 메서드는 "Hello, World"를 작성합니다.
+
+창이 가려진 경우(예: 화면이 잠긴 경우) 이 함수는 아무 것도 렌더링하지 않습니다.
+또한 이 기능은 Direct3D 장치가 기능 중에 사라지면 장치별 리소스를 자동으로 폐기합니다.
+다음에 호출될 때 리소스를 다시 만듭니다.
+*/
 HRESULT DemoApp::OnRender()
 {
     HRESULT hr;
@@ -301,10 +293,10 @@ HRESULT DemoApp::OnRender()
     return hr;
 }
 
-//
-//  If the application receives a WM_SIZE message, this method
-//  resizes the render target appropriately.
-//
+/*
+    응용 프로그램이 WM_SIZE 메시지를 받으면
+    이 메서드는 렌더링 대상의 크기를 적절하게 조정합니다.
+*/
 void DemoApp::OnResize(UINT width, UINT height)
 {
     if (m_pRenderTarget)
@@ -312,10 +304,8 @@ void DemoApp::OnResize(UINT width, UINT height)
         D2D1_SIZE_U size;
         size.width = width;
         size.height = height;
-
-        // Note: This method can fail, but it's okay to ignore the
-        // error here -- it will be repeated on the next call to
-        // EndDraw.
+               
+        //참고: 이 메서드는 실패할 수 있지만 여기에서 오류를 무시해도 됩니다. -- EndDraw에 대한 다음 호출에서 반복됩니다.
         m_pRenderTarget->Resize(size);
     }
 }
