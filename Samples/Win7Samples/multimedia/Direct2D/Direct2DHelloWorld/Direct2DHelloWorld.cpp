@@ -290,6 +290,7 @@ HRESULT DemoApp::OnRender()
         }
     }
 
+    m_pD2DFactory->
     return hr;
 }
 

@@ -350,7 +350,7 @@ LRESULT CALLBACK DemoApp::s_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         LPCREATESTRUCT pcs = reinterpret_cast<LPCREATESTRUCT> (lParam);
         pThis = reinterpret_cast<DemoApp *> (pcs->lpCreateParams);
 
-        SetWindowLongPtr(hWnd, GWLP_USERDATA, PtrToUlong(pThis));
+        SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)(pThis));
         lRet = DefWindowProc(hWnd, uMsg, wParam, lParam);
     }
     else
